@@ -1,0 +1,21 @@
+Types :
+    Primitives :
+        Number (Double precision 64-bit binary format IEEE 754)
+        String (16 bit unsigned integer values)
+        Null (one value -> null)
+        Undefined (one value -> undefined)
+    + Object
+        - Functions, arrays, property maps
+        - Object decalared as standard Object (var obj = {};)
+            - Can have keys of any string - Number keys are converted to string keys
+                - obj["abc"] == obj.abc -> {"abc", ...}
+                - obj["2"] == obj[2] (obj.2 invalid) -> {"2", ...}
+        - Object declared as array (var arr = [];)
+            - Can have keys of any non-natural-number that behave like standard objects
+                - obj["abc"] == obj.abc
+            - Natural-number keys act like a standard array
+                - obj["2"] == obj[2] -> index 2 of standard array
+            - length is the last index set
+        - Object daclared as function
+                (function func(...) {...} or var func = function(...) {...})
+            - callable -> properties have the same functionality as a standard object
