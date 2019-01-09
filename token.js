@@ -223,7 +223,7 @@ Token.OperatorInfo =
     {symbol:"typeof"    , numOperands:1, notation:Token.Notation.PREFIX  }, // TYPEOF             # 31
     {symbol:"delete"    , numOperands:1, notation:Token.Notation.PREFIX  }, // DELETE             # 32
     {symbol:"in"        , numOperands:2, notation:Token.Notation.INFIX   }, // IN                 # 33
-    {symbol:"instanceof", numOperands:1, notation:Token.Notation.PREFIX  }, // INSTANCEOF         # 34
+    {symbol:"instanceof", numOperands:2, notation:Token.Notation.INFIX   }, // INSTANCEOF         # 34
     {symbol:"void"      , numOperands:1, notation:Token.Notation.PREFIX  }  // VOID               # 35
 ]
 
