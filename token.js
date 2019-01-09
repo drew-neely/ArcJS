@@ -213,7 +213,7 @@ Token.OperatorInfo =
     {symbol:"?"         , numOperands:3, notation:Token.Notation.TERNARY }, // TERNARY            # 21
     {symbol:"&&"        , numOperands:2, notation:Token.Notation.INFIX   }, // LOGICAL_AND        # 22
     {symbol:"||"        , numOperands:2, notation:Token.Notation.INFIX   }, // LOGICAL_OR         # 23
-    {symbol:"!"         , numOperands:2, notation:Token.Notation.PREFIX  }, // LOGICAL_NOT        # 24
+    {symbol:"!"         , numOperands:1, notation:Token.Notation.PREFIX  }, // LOGICAL_NOT        # 24
     {symbol:"&"         , numOperands:2, notation:Token.Notation.INFIX   }, // BITWISE_AND        # 25
     {symbol:"|"         , numOperands:2, notation:Token.Notation.INFIX   }, // BITWISE_OR         # 26
     {symbol:"~"         , numOperands:2, notation:Token.Notation.PREFIX  }, // BITWISE_NOT        # 27
