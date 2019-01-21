@@ -1,0 +1,135 @@
+statement
+        : VAR assignmentExp ';' endStatement
+        | expression
+
+endStatement
+        : statement
+        | END
+
+value 
+        : NUMBER
+        | STRING
+        | ID
+
+expression
+        : commaExp
+
+commaExp
+        : commaExp ',' assignmentExp
+        | assignmentExp
+
+assignmentExp
+        : ID AssignmentSymbol assignmentExp
+        | ternaryExp
+
+ternaryExp
+        : logicalOrExp '?' ternaryExp ':' ternaryExp
+        | logicalOrExp
+
+logicalOrExp
+        : logicalOrExp '||' logicalAndExp
+        | logicalAndExp
+
+logicalAndExp
+        : logicalAndExp '&&' bitwiseOrExp
+        | logicalOrExp
+
+bitwiseOrExp
+        : bitwiseOrExp '|' bitwiseXorExp
+        | bitwiseXorExp
+
+bitwiseXorExp
+        : bitwiseXorExp '^' bitwiseAndExp
+        | bitwiseAndExp
+
+bitwiseAndExp
+        : bitwiseAndExp '&' equalityExp
+        | equalityExp
+
+equalityExp
+        : equalityExp EqualityOperatorSymbol comparatorExp
+        | comparatorExp
+
+comparatorExp
+        : comparatorExp ComparatorOperatorSymbol shiftExp
+        | shiftExp
+
+shiftExp
+        : shiftExp ShiftOperatorSymbol termExp
+        | termExp
+
+termExp
+        : termExp PlusOperatorSymbol factorExp
+        | factorExp
+
+factorExp
+        : factorExp TimesOperatorSymbol prefixExp
+        | prefixExp
+
+prefixExp
+        : PrefixOperatorSymbol prefixExp
+        | IncrementOperatorSymbol ID
+        | postfixExp
+
+postfixExp
+        : ID IncrementOperatorSymbol
+        | funcallExpr
+
+funcallExpr
+        : ID '(' expression ')'
+        | groupExp
+
+groupExp
+        : '(' expression ')'
+        | value
+
+
+////////////////////////////////////////////////////////////////////////
+
+IncrementOperatorSymbol
+        : '++'
+        | '--'
+
+PrefixOperatorSymbol
+        : '!'
+        | '~'
+        | '+'
+        | '-'
+        | 'typeof'
+        | 'void'
+        | 'delete'
+
+TimesOperatorSymbol
+        : '*'
+        | '/'
+        | '%'
+
+PlusOperatorSymbol
+        : '+'
+        | '-'
+
+ShiftOperatorSymbol
+        : '<<'
+        | '>>'
+
+ComparatorOperatorSymbol
+        : '<'
+        | '<='
+        | '>'
+        | '>='
+        | 'in'
+        | 'instanceof'
+
+EqualityOperatorSymbol
+        : '=='
+        | '!='
+        | '==='
+        | '!=='
+
+AssignmentSymbol
+        : '=' 
+        | '+=' 
+        | '-=' 
+        | '*=' 
+        | '/=' 
+        | '%='
