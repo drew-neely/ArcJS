@@ -1,8 +1,9 @@
 var lexer = require("./lexer.js");
 var fs = require("fs");
 
+var code;
 try {
-    var code = fs.readFileSync(process.argv[2], {encoding:"utf8"});
+    code = fs.readFileSync(process.argv[2], {encoding:"utf8"});
 } catch(error) {
     console.error("Cannot read from file : " + process.argv[2]);
     process.exit(1);

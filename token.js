@@ -1,20 +1,20 @@
 
-function Token(tokenType, value) {
-    this.tokenType = tokenType;
+function Token(type, value) {
+    this.type = type;
     this.value = value;
     this.link;
     this.operands;
     
     this.print = function() {
         var str = "TOKEN ::";
-        var type = "<type : " + Token.LexerTokenTypeInfo[this.tokenType].symbol + ">";
+        var type = "<type : " + Token.tokenTypeInfo[this.type].symbol + ">";
         while(type.length < 17) type += " ";
         var value;
-        switch(this.tokenType) {
-            case Token.LexerTokenType.NUMBER:
+        switch(this.type) {
+            case Token.tokenType.NUMBER:
                 value = this.value.toString();
                 break;
-            case Token.LexerTokenType.STRING:
+            case Token.tokenType.STRING:
                 value = this.value;
                 value = value.replace("\\", "\\\\"); // !!! // Probably fix at some point
                 value = value.replace("\"", "\\\"");
@@ -26,16 +26,16 @@ function Token(tokenType, value) {
                 value = value.replace("\f", "\\f");
                 value = "\"" + value + "\"";
                 break;
-            case Token.LexerTokenType.OPERATOR:
+            case Token.tokenType.OPERATOR:
                 value = Token.OperatorInfo[this.value].symbol;
                 break;
-            case Token.LexerTokenType.SPECIAL:
+            case Token.tokenType.SPECIAL:
                 value = Token.SpecialInfo[this.value].symbol;
                 break;
-            case Token.LexerTokenType.KEYWORD:
+            case Token.tokenType.KEYWORD:
                 value = Token.KeyWordInfo[this.value].symbol;
                 break;
-            case Token.LexerTokenType.ID:
+            case Token.tokenType.ID:
                 value = this.value;
                 break;
         }
@@ -49,7 +49,7 @@ Token.specialChars = [';', ':', ',', '(', ')', '{', '}', '[', ']', '.',
                       '+', '-', '*', '/', '%', '=', '!', '>', '<', '?',
                       '&', '|', '~', '^'];
 
-Token.LexerTokenType = {
+Token.tokenType = {
     NUMBER:0,
     STRING:1,
     OPERATOR:2,
@@ -58,7 +58,7 @@ Token.LexerTokenType = {
     ID:5
 };
 
-Token.LexerTokenTypeInfo = [
+Token.tokenTypeInfo = [
     {symbol:"number"   },
     {symbol:"string"   },
     {symbol:"operator" },

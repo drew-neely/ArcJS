@@ -82,15 +82,15 @@ var lexer = function(code) {
         } while(isWordChar(peek()) || isNumberChar(peek()));
         for(var op = 0; op < Token.OperatorInfo.length; op++) {
             if(Token.OperatorInfo[op].symbol == word) {
-                return new Token(Token.LexerTokenType.OPERATOR, op);
+                return new Token(Token.tokenType.OPERATOR, op);
             }
         }
         for(var kw = 0; kw < Token.KeyWordInfo.length; kw++) {
             if(Token.KeyWordInfo[kw].symbol == word) {
-                return new Token(Token.LexerTokenType.KEYWORD, kw);
+                return new Token(Token.tokenType.KEYWORD, kw);
             }
         }
-        return new Token(Token.LexerTokenType.ID, word);
+        return new Token(Token.tokenType.ID, word);
     }
 
     var getNumberToken = function() {
@@ -110,7 +110,7 @@ var lexer = function(code) {
             syntaxError("Invalid symbol \'" + peek() + "\' in number");
         }
         number = Number(number);
-        return new Token(Token.LexerTokenType.NUMBER, number);
+        return new Token(Token.tokenType.NUMBER, number);
     }
 
     var getStringToken = function() {
@@ -129,7 +129,7 @@ var lexer = function(code) {
             }
         }
         pop();
-        return new Token(Token.LexerTokenType.STRING, str);
+        return new Token(Token.tokenType.STRING, str);
     }
 
     var getSymbolToken = function() {
@@ -141,12 +141,12 @@ var lexer = function(code) {
         while(str != '') {
             for(var i = 0; i < Token.OperatorInfo.length; i++) {
                 if(Token.OperatorInfo[i].symbol == str) {
-                    return new Token(Token.LexerTokenType.OPERATOR, i);
+                    return new Token(Token.tokenType.OPERATOR, i);
                 }
             }
             for(var i = 0; i < Token.SpecialInfo.length; i++) {
                 if(Token.SpecialInfo[i].symbol == str) {
-                    return new Token(Token.LexerTokenType.SPECIAL, i);
+                    return new Token(Token.tokenType.SPECIAL, i);
                 }
             }
             unpop();
