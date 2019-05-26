@@ -173,6 +173,7 @@ var lexer = function(code) {
             }
             skipWhitespaceAndComments();
         }
+        res.push(new Token(Token.tokenType.END));
         return res;
     }
 }

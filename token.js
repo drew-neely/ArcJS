@@ -38,6 +38,9 @@ function Token(type, value) {
             case Token.tokenType.ID:
                 value = this.value;
                 break;
+            case Token.tokenType.END:
+                value = "EOF";
+                break;
         }
         value = "<value : " + value + " >"
         console.log(str + " " + type + " " + value);
@@ -55,7 +58,8 @@ Token.tokenType = {
     OPERATOR:2,
     SPECIAL: 3,
     KEYWORD:4,
-    ID:5
+    ID:5,
+    END:6
 };
 
 Token.tokenTypeInfo = [
@@ -64,7 +68,8 @@ Token.tokenTypeInfo = [
     {symbol:"operator" },
     {symbol:"special"  },
     {symbol:"keyword"  },
-    {symbol:"id"       }
+    {symbol:"id"       },
+    {symbol:"end"      }
 ];
 
 Token.SpecialType = {

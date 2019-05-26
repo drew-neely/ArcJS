@@ -1,4 +1,13 @@
 
+var nextTerminalId = 0;
+var Terminal = function(name, properties) {
+    this.name = name;
+    this.properties = properties;
+    this.id = nextTerminalId++;
+    this.toString = () => "(" + (this.id < 10 ? ' ' : '') + this.id + "T) " + this.name + " " + JSON.stringify(this.properties)
+    // this.toString = () => "--->  T " + this.name + " (" + this.id + "),\n\t" + JSON.stringify(this.properties) + "\n<---------"
+}
+
 var ALIAS = "alias"
 // alias str1 str2 -> every future instance of str1 in right side of alias 
 //      and define operations will be replaced by str2
@@ -25,7 +34,7 @@ function isAlphaNumeric(char) {
     var code = char.charCodeAt(0);
     var num     = code > 47 && code < 58;
     var upalph  = code > 64 && code < 91;
-    var lowalph = code > 96 && code < 123
+    var lowalph = code > 96 && code < 123;
     if (num || upalph || lowalph) {
         return true;
     } else {
@@ -33,8 +42,8 @@ function isAlphaNumeric(char) {
     }
 }
 
+ // !!! // if alias is substring of another word, value will still be subbed in
 function subAliases(code, aliases) {
-    
     for(var i = 0; i < aliases.length; i++) {
         var id = aliases[i][0];
         var sub = aliases[i][1];
@@ -90,9 +99,9 @@ var syntaxError = function(str) {
 
 function extract(defs) {
     var ops = defs.split("\n").map(e => {
-        return e.replace(/\s+/g, ' ').trim();
+        return e.replace(/\s+/g, ' ').trim(); // All white space -> ' '
     }).filter(e => {
-        return e.length != 0;
+        return e.length != 0; // Remove empty lines (probably won't be any ?)
     });
     var aliases = [];
     var definitions = [];
@@ -105,11 +114,10 @@ function extract(defs) {
         } else if(op.substring(0, DEFINE.length) == DEFINE) {
             op = op.substring(DEFINE.length + 1);
             var def = getPair(op);
-            var id = def[0];
+            var name = def[0];
             var code = def[1];
             code = subAliases(code, aliases);
-            code = objectify(code);
-            definitions.push([id, code]);
+            definitions.push(new Terminal(name, objectify(code)));
         } else {
             syntaxError("Invalid line :\n\t" + op);
         }
@@ -117,4 +125,4 @@ function extract(defs) {
     return definitions;
 }
 
-module.exports = {extract: extract};
+module.exports = {extract: extract, Terminal: Terminal};

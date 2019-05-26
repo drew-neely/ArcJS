@@ -9,171 +9,194 @@ alias operator Token.tokenType.OPERATOR
 alias special  Token.tokenType.SPECIAL
 alias keyword  Token.tokenType.KEYWORD
 alias id       Token.tokenType.ID
+alias end      Token.tokenType.END
 
 alias op  Token.OperatorType
 alias sp  Token.SpecialType
 alias kw  Token.KeyWordType
 
-define NUMBER     { type : number                                  }
-define STRING     { type : string                                  }
-define ID         { type : id                                      }
+define NUMBER       { type : number                                  }
+define STRING       { type : string                                  }
+define ID           { type : id                                      }
+define END          { type : end                                     }
 
-define '+'        { type : operator, value : op.PLUS               }
-define '-'        { type : operator, value : op.MINUS              }
-define '*'        { type : operator, value : op.TIMES              }
-define '/'        { type : operator, value : op.DIVIDE             }
-define '%'        { type : operator, value : op.MODULUS            }
-define '++'       { type : operator, value : op.INCREMENT          }
-define '--'       { type : operator, value : op.DECREMENT          }
-define '='        { type : operator, value : op.ASSIGN             }
-define '+='       { type : operator, value : op.ASSIGN_PLUS        }
-define '-='       { type : operator, value : op.ASSIGN_MINUS       }
-define '*='       { type : operator, value : op.ASSIGN_TIMES       }
-define '/='       { type : operator, value : op.ASSIGN_DIVIDE      }
-define '%='       { type : operator, value : op.ASSIGN_MODULUS     }
-define '=='       { type : operator, value : op.EQUAL              }
-define '==='      { type : operator, value : op.EQUAL_TYPE         }
-define '!='       { type : operator, value : op.NOT_EQUAL          }
-define '!=='      { type : operator, value : op.NOT_EQUAL_TYPE     }
-define '>'        { type : operator, value : op.GREATER_THAN       }
-define '<'        { type : operator, value : op.LESS_THAN          }
-define '>='       { type : operator, value : op.GREATER_THAN_EQUAL }
-define '<='       { type : operator, value : op.LESS_THAN_EQUAL    }
-define '?'        { type : operator, value : op.TERNARY            }
-define '&&'       { type : operator, value : op.LOGICAL_AND        }
-define '||'       { type : operator, value : op.LOGICAL_OR         }
-define '!'        { type : operator, value : op.LOGICAL_NOT        }
-define '&'        { type : operator, value : op.BITWISE_AND        }
-define '|'        { type : operator, value : op.BITWISE_OR         }
-define '~'        { type : operator, value : op.BITWISE_NOT        }
-define '^'        { type : operator, value : op.BITWISE_XOR        }
-define '<<'       { type : operator, value : op.BITWISE_LSHIFT     }
-define '>>'       { type : operator, value : op.BITWISE_RSHIFT     }
-define TYPEOF     { type : operator, value : op.TYPEOF             }
-define DELETE     { type : operator, value : op.DELETE             }
-define IN         { type : operator, value : op.IN                 }
-define INSTANCEOF { type : operator, value : op.INSTANCEOF         }
-define VOID       { type : operator, value : op.VOID               }
+define '+'          { type : operator, value : op.PLUS               }
+define '-'          { type : operator, value : op.MINUS              }
+define '*'          { type : operator, value : op.TIMES              }
+define '/'          { type : operator, value : op.DIVIDE             }
+define '%'          { type : operator, value : op.MODULUS            }
+define '++'         { type : operator, value : op.INCREMENT          }
+define '--'         { type : operator, value : op.DECREMENT          }
+define '='          { type : operator, value : op.ASSIGN             }
+define '+='         { type : operator, value : op.ASSIGN_PLUS        }
+define '-='         { type : operator, value : op.ASSIGN_MINUS       }
+define '*='         { type : operator, value : op.ASSIGN_TIMES       }
+define '/='         { type : operator, value : op.ASSIGN_DIVIDE      }
+define '%='         { type : operator, value : op.ASSIGN_MODULUS     }
+define '=='         { type : operator, value : op.EQUAL              }
+define '==='        { type : operator, value : op.EQUAL_TYPE         }
+define '!='         { type : operator, value : op.NOT_EQUAL          }
+define '!=='        { type : operator, value : op.NOT_EQUAL_TYPE     }
+define '>'          { type : operator, value : op.GREATER_THAN       }
+define '<'          { type : operator, value : op.LESS_THAN          }
+define '>='         { type : operator, value : op.GREATER_THAN_EQUAL }
+define '<='         { type : operator, value : op.LESS_THAN_EQUAL    }
+define '?'          { type : operator, value : op.TERNARY            }
+define '&&'         { type : operator, value : op.LOGICAL_AND        }
+define '||'         { type : operator, value : op.LOGICAL_OR         }
+define '!'          { type : operator, value : op.LOGICAL_NOT        }
+define '&'          { type : operator, value : op.BITWISE_AND        }
+define '|'          { type : operator, value : op.BITWISE_OR         }
+define '~'          { type : operator, value : op.BITWISE_NOT        }
+define '^'          { type : operator, value : op.BITWISE_XOR        }
+define '<<'         { type : operator, value : op.BITWISE_LSHIFT     }
+define '>>'         { type : operator, value : op.BITWISE_RSHIFT     }
+define 'typeof'     { type : operator, value : op.TYPEOF             }
+define 'delete'     { type : operator, value : op.DELETE             }
+define 'in'         { type : operator, value : op.IN                 }
+define 'instanceof' { type : operator, value : op.INSTANCEOF         }
+define 'void'       { type : operator, value : op.VOID               }
 
-define ';'        { type : special, value : sp.SEMICOLON           }
-define ':'        { type : special, value : sp.COLON               }
-define ','        { type : special, value : sp.COMMA               }
-define '('        { type : special, value : sp.L_PAREN             }
-define ')'        { type : special, value : sp.R_PAREN             }
-define '{'        { type : special, value : sp.L_CURLY_BRACKET     }
-define '}'        { type : special, value : sp.R_CURLY_BRACKET     }
-define '['        { type : special, value : sp.L_SQUARE_BRACKET    }
-define ']'        { type : special, value : sp.R_SQUARE_BRACKET    }
-define '=>'       { type : special, value : sp.ARROW               }
-define '.'        { type : special, value : sp.DOT                 }
+define ';'          { type : special, value : sp.SEMICOLON           }
+define ':'          { type : special, value : sp.COLON               }
+define ','          { type : special, value : sp.COMMA               }
+define '('          { type : special, value : sp.L_PAREN             }
+define ')'          { type : special, value : sp.R_PAREN             }
+define '{'          { type : special, value : sp.L_CURLY_BRACKET     }
+define '}'          { type : special, value : sp.R_CURLY_BRACKET     }
+define '['          { type : special, value : sp.L_SQUARE_BRACKET    }
+define ']'          { type : special, value : sp.R_SQUARE_BRACKET    }
+define '=>'         { type : special, value : sp.ARROW               }
+define '.'          { type : special, value : sp.DOT                 }
 
-define VAR        { type : keyword, value : kw.VAR                 }
-define IF         { type : keyword, value : kw.IF                  }
-define ELSE       { type : keyword, value : kw.ELSE                }
-define WHILE      { type : keyword, value : kw.WHILE               }
-define DO         { type : keyword, value : kw.DO                  }
-define FOR        { type : keyword, value : kw.FOR                 }
-define SWITCH     { type : keyword, value : kw.SWITCH              }
-define CASE       { type : keyword, value : kw.CASE                }
-define BREAK      { type : keyword, value : kw.BREAK               }
-define WITH       { type : keyword, value : kw.WITH                }
-define DEFAULT    { type : keyword, value : kw.DEFAULT             }
-define TRY        { type : keyword, value : kw.TRY                 }
-define CATCH      { type : keyword, value : kw.CATCH               }
-define FINALLY    { type : keyword, value : kw.FINALLY             }
-define THROW      { type : keyword, value : kw.THROW               }
-define NEW        { type : keyword, value : kw.NEW                 }
-define RETURN     { type : keyword, value : kw.RETURN              }
-define THIS       { type : keyword, value : kw.THIS                }
-define CONTINUE   { type : keyword, value : kw.CONTINUE            }
-define FUNCTION   { type : keyword, value : kw.FUNCTION            }
+define VAR          { type : keyword, value : kw.VAR                 }
+define IF           { type : keyword, value : kw.IF                  }
+define ELSE         { type : keyword, value : kw.ELSE                }
+define WHILE        { type : keyword, value : kw.WHILE               }
+define DO           { type : keyword, value : kw.DO                  }
+define FOR          { type : keyword, value : kw.FOR                 }
+define SWITCH       { type : keyword, value : kw.SWITCH              }
+define CASE         { type : keyword, value : kw.CASE                }
+define BREAK        { type : keyword, value : kw.BREAK               }
+define WITH         { type : keyword, value : kw.WITH                }
+define DEFAULT      { type : keyword, value : kw.DEFAULT             }
+define TRY          { type : keyword, value : kw.TRY                 }
+define CATCH        { type : keyword, value : kw.CATCH               }
+define FINALLY      { type : keyword, value : kw.FINALLY             }
+define THROW        { type : keyword, value : kw.THROW               }
+define NEW          { type : keyword, value : kw.NEW                 }
+define RETURN       { type : keyword, value : kw.RETURN              }
+define THIS         { type : keyword, value : kw.THIS                }
+define CONTINUE     { type : keyword, value : kw.CONTINUE            }
+define FUNCTION     { type : keyword, value : kw.FUNCTION            }
 
 %%
 
 statement
         : VAR assignmentExp ';' endStatement
         | expression
+        ;
 
 endStatement
         : statement
         | END
+        ;
 
 value 
         : NUMBER
         | STRING
         | ID
+        ;
 
 expression
         : commaExp
+        ;
 
 commaExp
         : commaExp ',' assignmentExp
         | assignmentExp
+        ;
 
 assignmentExp
         : ID AssignmentSymbol assignmentExp
         | ternaryExp
+        ;
 
 ternaryExp
         : logicalOrExp '?' ternaryExp ':' ternaryExp
         | logicalOrExp
+        ;
 
 logicalOrExp
         : logicalOrExp '||' logicalAndExp
         | logicalAndExp
+        ;
 
 logicalAndExp
         : logicalAndExp '&&' bitwiseOrExp
         | logicalOrExp
+        ;
 
 bitwiseOrExp
         : bitwiseOrExp '|' bitwiseXorExp
         | bitwiseXorExp
+        ;
 
 bitwiseXorExp
         : bitwiseXorExp '^' bitwiseAndExp
         | bitwiseAndExp
+        ;
 
 bitwiseAndExp
         : bitwiseAndExp '&' equalityExp
         | equalityExp
+        ;
 
 equalityExp
         : equalityExp EqualityOperatorSymbol comparatorExp
         | comparatorExp
+        ;
 
 comparatorExp
         : comparatorExp ComparatorOperatorSymbol shiftExp
         | shiftExp
+        ;
 
 shiftExp
         : shiftExp ShiftOperatorSymbol termExp
         | termExp
+        ;
 
 termExp
         : termExp PlusOperatorSymbol factorExp
         | factorExp
+        ;
 
 factorExp
         : factorExp TimesOperatorSymbol prefixExp
         | prefixExp
+        ;
 
 prefixExp
         : PrefixOperatorSymbol prefixExp
         | IncrementOperatorSymbol ID
         | postfixExp
+        ;
 
 postfixExp
         : ID IncrementOperatorSymbol
         | funcallExpr
+        ;
 
 funcallExpr
         : ID '(' expression ')'
         | groupExp
+        ;
 
 groupExp
         : '(' expression ')'
         | value
+        ;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -181,6 +204,7 @@ groupExp
 IncrementOperatorSymbol
         : '++'
         | '--'
+        ;
 
 PrefixOperatorSymbol
         : '!'
@@ -190,19 +214,23 @@ PrefixOperatorSymbol
         | 'typeof'
         | 'void'
         | 'delete'
+        ;
 
 TimesOperatorSymbol
         : '*'
         | '/'
         | '%'
+        ;
 
 PlusOperatorSymbol
         : '+'
         | '-'
+        ;
 
 ShiftOperatorSymbol
         : '<<'
         | '>>'
+        ;
 
 ComparatorOperatorSymbol
         : '<'
@@ -211,12 +239,14 @@ ComparatorOperatorSymbol
         | '>='
         | 'in'
         | 'instanceof'
+        ;
 
 EqualityOperatorSymbol
         : '=='
         | '!='
         | '==='
         | '!=='
+        ;
 
 AssignmentSymbol
         : '=' 
@@ -225,3 +255,5 @@ AssignmentSymbol
         | '*=' 
         | '/=' 
         | '%='
+        ;
+        
