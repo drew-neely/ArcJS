@@ -1,7 +1,13 @@
+var Item = require("./item.js").Item;
 
 var nextNonTerminalId = 0;
 var NonTerminal = function(name) {
     this.name = name;
+    this.id = nextNonTerminalId++;
+    this.equals = function(other) {
+        return (other instanceof NonTerminal) && (this.id == other.id);
+    }
+    // Production list kept inside NonTerminal class is ciruclar (semi-duplicate) data
     this.productions = [];
     this.addProduction = function(prod) {
         if(!(prod instanceof Production)) {
@@ -9,7 +15,6 @@ var NonTerminal = function(name) {
         }
         this.productions.push(prod);
     };
-    this.id = nextNonTerminalId++;
     this.toString = function() {
         var str = "---> NT " + this.name + " (" + this.id + "),";
         for(var i = 0; i < this.productions.length; i++) {
@@ -18,14 +23,36 @@ var NonTerminal = function(name) {
         str += "\n<---------";
         return str;
     }
+    this.isNonTerminal = () => true;
+    this.isTerminal = () => false;
+    
 }
 
-var Production = function(terms) {
-    this.terms = terms;
+var nextProductionRuleNumber = 0;
+var Production = function(LHS, RHS) {
+    if(!(LHS instanceof NonTerminal)) {
+        throw "Internal Error : LHS of production must be a NonTerminal";
+    }
+    this.ruleNumber = nextProductionRuleNumber++; // Increment after assignment
+    this.LHS = LHS
+    this.RHS = RHS;
+    this.startItem = new Item(this);
     this.toString = function() {
-        return terms.map(function(e) {
-            return "<" + ((e instanceof NonTerminal)? "NT" : "T") + " " + e.name + ">";
-        }).join(' ');
+        var LString = this.LHS.name
+        var RString = this.RHS.map(e => e.name).join(' ');
+        return LString + " -> " + RString;
+    }
+    this.equals = function(other) {
+        if ((other instanceof Production) && this.LHS.equals(other.LHS) && this.RHS.length == other.RHS.length) {
+            for(var i = 0; i < this.RHS.length; i++) {
+                if(this.RHS[i] != other.RHS[i]) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
@@ -99,14 +126,16 @@ function lex(code) {
     var cases = [];
     while(code.trim() != '') {
         var index = code.indexOf(':');
-        if(index === -1) {
-            SyntaxError("Production does not contain \':\'");
+        if(index == -1) {
+            syntaxError("Production does not contain \':\'");
         }
         var name = code.substring(0, index).trim();
         validate(name);
         code = code.substring(index + 1);
-
         index = indexOfNoQuotes(code, ';');
+        if(index == -1) {
+            syntaxError("Expected \';\'");
+        }
         // var prodCases = code.substring(0, index).split('|').map(e => { // !!!
         var prodCases = splitNoQuotes(code.substring(0, index), '|').map(e => { // !!!
             var terms = e.trim().split(/\s+/g);
@@ -153,25 +182,29 @@ function extract(code, terminals) {
     for(var i = 0; i < ntNames.length; i++) {
         nonTerminals.push(new NonTerminal(ntNames[i]));
     }
+    var productions = [];
 
     for(var nt = 0; nt < ntCases.length; nt++) {
         for(var i = 0; i < ntCases[nt].length; i++) {
-            nonTerminals[nt].addProduction(
-                new Production(ntCases[nt][i].map(termName => {
-                    var ntIndex = ntNames.indexOf(termName);
-                    if(ntIndex != -1) {
-                        return nonTerminals[ntIndex];
-                    }
-                    var tIndex = tNames.indexOf(termName);
-                    if(tIndex != -1) {
-                        return terminals[tIndex]
-                    }
-                    syntaxError("Undefined symbol \'" + termName + "\'");
-                })
-            ));
+            productionElements = ntCases[nt][i].map(termName => {
+                var ntIndex = ntNames.indexOf(termName);
+                if(ntIndex != -1) {
+                    return nonTerminals[ntIndex];
+                }
+                var tIndex = tNames.indexOf(termName);
+                if(tIndex != -1) {
+                    return terminals[tIndex]
+                }
+                syntaxError("Undefined symbol \'" + termName + "\'");
+            });
+            production = new Production(nonTerminals[nt], productionElements);
+            productions.push(production);
+            nonTerminals[nt].addProduction(production);
         }
     }
-    return nonTerminals;
+    return {nonTerminals : nonTerminals, productions : productions};
 }
 
-module.exports = {extract: extract}
+module.exports.NonTerminal = NonTerminal;
+module.exports.extract = extract;
+module.exports.Production = Production;

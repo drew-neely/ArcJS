@@ -6,6 +6,11 @@ var Terminal = function(name, properties) {
     this.id = nextTerminalId++;
     this.toString = () => "(" + (this.id < 10 ? ' ' : '') + this.id + "T) " + this.name + " " + JSON.stringify(this.properties)
     // this.toString = () => "--->  T " + this.name + " (" + this.id + "),\n\t" + JSON.stringify(this.properties) + "\n<---------"
+    this.equals = function(other) {
+        return (other instanceof Terminal) && (this.id == other.id);
+    }
+    this.isNonTerminal = () => false;
+    this.isTerminal = () => true;
 }
 
 var ALIAS = "alias"
@@ -78,17 +83,18 @@ function objectify(objString) {
     var middle = objString.substring(1,objString.length-1);
 
     var obj = {};
-
-    middle.split(',').map(pairStr => {
-        var pair = pairStr.split(':');
-        if(pair.length != 2) {
-            syntaxError("Invalid object entry : \'" + pairStr + "\'");
-        }
-        pair = pair.map(e => e.trim());
-        return pair;
-    }).forEach(pair => {
-        obj[pair[0]] = pair[1];
-    });
+    if(middle.length > 0) {
+        middle.split(',').map(pairStr => {
+            var pair = pairStr.split(':');
+            if(pair.length != 2) {
+                syntaxError("Invalid object entry : \'" + pairStr + "\'");
+            }
+            pair = pair.map(e => e.trim());
+            return pair;
+        }).forEach(pair => {
+            obj[pair[0]] = pair[1];
+        });
+    }
 
     return obj;
 }

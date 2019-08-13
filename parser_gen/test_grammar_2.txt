@@ -1,0 +1,17 @@
+
+
+%%
+
+define '$' {}
+define 'a' {}
+define 'b' {}
+
+%%
+
+Start : A;
+
+A   : B 'a'
+    | 'a'
+    ;
+
+B   : 'b' A ;

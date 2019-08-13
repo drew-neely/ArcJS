@@ -134,7 +134,7 @@ logicalOrExp
 
 logicalAndExp
         : logicalAndExp '&&' bitwiseOrExp
-        | logicalOrExp
+        | bitwiseOrExp
         ;
 
 bitwiseOrExp

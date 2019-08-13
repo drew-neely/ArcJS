@@ -1,0 +1,15 @@
+
+
+%%
+
+define '$' {}
+define 'a' {}
+define 'b' {}
+
+%%
+
+Start : S;
+
+S   : 'a' S 'b' S
+    | 'a'
+    ;
