@@ -1,9 +1,8 @@
 var { Item, ItemSet } = require("./item");
 
 var getItemSets = function(productions) {
-    var is0 = new ItemSet(productions.map(e => e.startItem));
-    var built = is0.build();
-    console.log(is0.toString());
+    var is0 = new ItemSet([productions[0].startItem]);
+    var built = is0.buildAll();
     built.forEach(e => console.log(e.toString()));
 }
 
