@@ -3,11 +3,11 @@
 
 %%
 
+define '+' {}
+define '*' {}
 define '(' {}
 define ')' {}
 define id  {}
-define '+' {}
-define '*' {}
 
 %%
 

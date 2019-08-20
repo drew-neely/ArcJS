@@ -1,0 +1,17 @@
+
+
+
+%%
+
+define a {}
+define b {}
+define c {}
+define d {}
+define e {}
+
+%%
+
+Start : A ;
+
+A : b c B;
+B : d e A;

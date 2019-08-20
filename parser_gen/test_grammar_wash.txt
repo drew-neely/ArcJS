@@ -2,7 +2,6 @@
 
 %%
 
-define '$' {}
 define 'a' {}
 define 'b' {}
 
