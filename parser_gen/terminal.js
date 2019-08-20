@@ -1,8 +1,11 @@
 
 var nextTerminalId = 0;
-var Terminal = function(name, properties) {
+var Terminal = function(name, properties, isEOF) {
     this.name = name;
     this.properties = properties;
+    this.isEOF = function() {
+        return (isEOF == undefined)? false : true;
+    }
     this.id = nextTerminalId++;
     this.toString = () => "(" + (this.id < 10 ? ' ' : '') + this.id + "T) " + this.name + " " + JSON.stringify(this.properties)
     // this.toString = () => "--->  T " + this.name + " (" + this.id + "),\n\t" + JSON.stringify(this.properties) + "\n<---------"
@@ -128,6 +131,7 @@ function extract(defs) {
             syntaxError("Invalid line :\n\t" + op);
         }
     }
+    definitions.push(new Terminal("EOF", {type : "EOF"}, true)) // !!! // define EOF symbol better
     return definitions;
 }
 

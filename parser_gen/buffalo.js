@@ -33,4 +33,7 @@ var {nonTerminals, productions} = Production.extract(prodString, terminals);
 // nonTerminals.forEach(e => console.log(e.toString()));
 productions.forEach(e => console.log(e.toString()));
 
-slrTable.getItemSets(productions);
+var itemSets = slrTable.getItemSets(productions);
+
+var parseTable = new slrTable.ParseTable(itemSets, productions, terminals, nonTerminals);
+console.log(parseTable.toString());

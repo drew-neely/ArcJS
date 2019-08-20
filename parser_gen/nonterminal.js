@@ -29,10 +29,11 @@ var NonTerminal = function(name) {
 }
 
 var nextProductionRuleNumber = 0;
-var Production = function(LHS, RHS) {
+var Production = function(LHS, RHS, isStart) {
     if(!(LHS instanceof NonTerminal)) {
         throw "Internal Error : LHS of production must be a NonTerminal";
     }
+    this.isStart = isStart;
     this.ruleNumber = nextProductionRuleNumber++; // Increment after assignment
     this.LHS = LHS
     this.RHS = RHS;
@@ -183,6 +184,7 @@ function extract(code, terminals) {
         nonTerminals.push(new NonTerminal(ntNames[i]));
     }
     var productions = [];
+    var isFirst = true;
 
     for(var nt = 0; nt < ntCases.length; nt++) {
         for(var i = 0; i < ntCases[nt].length; i++) {
@@ -197,7 +199,8 @@ function extract(code, terminals) {
                 }
                 syntaxError("Undefined symbol \'" + termName + "\'");
             });
-            production = new Production(nonTerminals[nt], productionElements);
+            production = new Production(nonTerminals[nt], productionElements, isFirst);
+            isFirst = false;
             productions.push(production);
             nonTerminals[nt].addProduction(production);
         }
