@@ -28,10 +28,5 @@ var defString = sections[1];
 var prodString = sections[2];
 
 var terminals = Terminal.extract(defString);
-// terminals.forEach(e => console.log(e.toString()));
 var {nonTerminals, productions} = Production.extract(prodString, terminals);
-// nonTerminals.forEach(e => console.log(e.toString()));
-productions.forEach(e => console.log(e.toString()));
-
 var parseTable = slrTable(productions, terminals, nonTerminals);
-console.log(parseTable.toString());
