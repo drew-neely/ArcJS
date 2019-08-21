@@ -3,7 +3,6 @@ var { Item, ItemSet } = require("./item");
 var getItemSets = function(productions) {
     var is0 = new ItemSet([productions[0].startItem]);
     var built = is0.buildAll();
-    built.forEach(e => console.log(e.toString()));
     return built;
 }
 
@@ -366,9 +365,10 @@ var ParseTable = function(itemSet, productions, terminals, nonTerminals) {
     }
 }
 
-var buildParseTable = function(terminals, nonTerminals) {
-    
+var buildParseTable = function(productions, terminals, nonTerminals) {
+    var itemSets = getItemSets(productions);
+    var parseTable = new ParseTable(itemSets, productions, terminals, nonTerminals);
+    return parseTable;
 }
 
-module.exports.getItemSets = getItemSets;
-module.exports.ParseTable = ParseTable;
+module.exports = buildParseTable;
