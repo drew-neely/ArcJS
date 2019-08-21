@@ -135,4 +135,5 @@ function extract(defs) {
     return definitions;
 }
 
-module.exports = {extract: extract, Terminal: Terminal};
+module.exports.Terminal = Terminal;
+module.exports.extract = extract;

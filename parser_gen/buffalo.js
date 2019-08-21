@@ -1,7 +1,8 @@
 var fs = require("fs");
 var Terminal = require("./terminal.js");
-var Production = require("./nonterminal.js");
-var slrTable = require("./slrTable.js");
+var NonTerminal = require("./nonterminal.js");
+var { Production } = require("./production.js");
+var { buildParseTable } = require("./slrTable.js");
 
 var code;
 try {
@@ -28,5 +29,5 @@ var defString = sections[1];
 var prodString = sections[2];
 
 var terminals = Terminal.extract(defString);
-var {nonTerminals, productions} = Production.extract(prodString, terminals);
-var parseTable = slrTable(productions, terminals, nonTerminals);
+var {nonTerminals, productions} = NonTerminal.extract(prodString, terminals);
+var parseTable = buildParseTable(productions, terminals, nonTerminals);

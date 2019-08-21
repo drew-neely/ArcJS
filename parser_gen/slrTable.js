@@ -1,4 +1,4 @@
-var { Item, ItemSet } = require("./item");
+var ItemSet = require("./item").ItemSet;
 
 var getItemSets = function(productions) {
     var is0 = new ItemSet([productions[0].startItem]);
@@ -13,7 +13,7 @@ var OperationType = {
     ACCEPT : 3
 }
 
-var ReduceOperation = function(production) {
+var ReduceOperation = function(production) { // stores production object
     this.opType = OperationType.REDUCE;
     this.production = production;
     this.toString = function() {
@@ -21,7 +21,7 @@ var ReduceOperation = function(production) {
     }
 }
 
-var ShiftOperation = function(state) {
+var ShiftOperation = function(state) { // stores next state number
     this.opType = OperationType.SHIFT;
     this.state = state;
     this.toString = function() {
@@ -29,7 +29,7 @@ var ShiftOperation = function(state) {
     }
 }
 
-var GotoOperation = function(state) {
+var GotoOperation = function(state) { // sotres state number
     this.opType = OperationType.SHIFT;
     this.state = state;
     this.toString = function() {
@@ -371,4 +371,5 @@ var buildParseTable = function(productions, terminals, nonTerminals) {
     return parseTable;
 }
 
-module.exports = buildParseTable;
+module.exports.buildParseTable = buildParseTable;
+module.exports.OperationType = OperationType;

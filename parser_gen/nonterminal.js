@@ -1,4 +1,4 @@
-var Item = require("./item.js").Item;
+var Production = require("./production.js").Production;
 
 var nextNonTerminalId = 0;
 var NonTerminal = function(name) {
@@ -28,36 +28,6 @@ var NonTerminal = function(name) {
     
 }
 
-var nextProductionRuleNumber = 0;
-var Production = function(LHS, RHS, isStart) {
-    if(!(LHS instanceof NonTerminal)) {
-        throw "Internal Error : LHS of production must be a NonTerminal";
-    }
-    this.isStart = isStart;
-    this.ruleNumber = nextProductionRuleNumber++; // Increment after assignment
-    this.LHS = LHS
-    this.RHS = RHS;
-    this.startItem = new Item(this);
-    this.toString = function() {
-        var LString = this.LHS.name
-        var RString = this.RHS.map(e => e.name).join(' ');
-        return LString + " -> " + RString;
-    }
-    this.equals = function(other) {
-        if ((other instanceof Production) && this.LHS.equals(other.LHS) && this.RHS.length == other.RHS.length) {
-            for(var i = 0; i < this.RHS.length; i++) {
-                if(this.RHS[i] != other.RHS[i]) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-}
-
-
 function validate(id) {
     if(/[^A-Za-z0-9_\"\']/g.test(id) || id.length == 0) {
         SyntaxError("Invalid identifier name : \'" + id + "\'");
@@ -66,7 +36,7 @@ function validate(id) {
     }
 }
 
-function indexOfNoQuotes(code, symbol) {
+function indexOfInCode(code, symbol) {
     var index;
     var start = 0;
     var again;
@@ -75,17 +45,20 @@ function indexOfNoQuotes(code, symbol) {
         if(index === -1) {
             return -1;
         }
-        var q1 = code.substring(start).search(/[\'\"]/g);
+        var q1 = code.substring(start).search(/[\'\"{]/g);
         if(q1 !== -1) {
             q1 += start;
             var c1 = code.charAt(q1);
-            var q2 = code.indexOf(c1, q1 + 1);
+            var q2 = (c1 == '{')? code.indexOf('}', q1 + 1) : code.indexOf(c1, q1 + 1);
             if(q2 !== -1 && (q1 < index && index < q2)) {
                 start = q2 + 1;
                 again = true;
             } else if(q2 === -1) {
                 syntaxError("Unmatched symbol \'" + c1 + "\'");
                 again = false;
+            } else if(index > q2) {
+                again = true;
+                start = q2 + 1;
             } else {
                 again = false;
             }
@@ -96,11 +69,11 @@ function indexOfNoQuotes(code, symbol) {
     return index;
 }
 
-var splitNoQuotes = function(code, symbol) {
+var splitInCode = function(code, symbol) {
     var res = [];
     var index;
     do {
-        index = indexOfNoQuotes(code, symbol);
+        index = indexOfInCode(code, symbol);
         if(index !== -1) {
             res.push(code.substring(0, index));
             code = code.substring(index + 1);
@@ -133,15 +106,27 @@ function lex(code) {
         var name = code.substring(0, index).trim();
         validate(name);
         code = code.substring(index + 1);
-        index = indexOfNoQuotes(code, ';');
+        index = indexOfInCode(code, ';');
         if(index == -1) {
             syntaxError("Expected \';\'");
         }
-        // var prodCases = code.substring(0, index).split('|').map(e => { // !!!
-        var prodCases = splitNoQuotes(code.substring(0, index), '|').map(e => { // !!!
-            var terms = e.trim().split(/\s+/g);
+        var prodCases = splitInCode(code.substring(0, index), '|').map(rhs => { // !!!
+            rhs = rhs.trim();
+            var bracketIndex = indexOfInCode(rhs, '{');
+            console.log("rhs: "+ rhs);
+            console.log("Found { at " + bracketIndex);
+            var action = null;
+            if(bracketIndex != -1) {
+                console.log("Non null action");
+                if(rhs.charAt(rhs.length - 1) != '}') {
+                    syntaxError("Expected \'}\' at end of action definition");
+                }
+                action = rhs.substring(bracketIndex+1,rhs.length-1).trim();
+                rhs = rhs.substring(0,bracketIndex);
+            }
+            var terms = rhs.trim().split(/\s+/g);
             terms.forEach(e => validate(e));
-            return terms;
+            return {terms: terms, action: action};
         });
         code = code.substring(index + 1);
 
@@ -188,7 +173,7 @@ function extract(code, terminals) {
 
     for(var nt = 0; nt < ntCases.length; nt++) {
         for(var i = 0; i < ntCases[nt].length; i++) {
-            productionElements = ntCases[nt][i].map(termName => {
+            var productionElements = ntCases[nt][i].terms.map(termName => {
                 var ntIndex = ntNames.indexOf(termName);
                 if(ntIndex != -1) {
                     return nonTerminals[ntIndex];
@@ -199,7 +184,8 @@ function extract(code, terminals) {
                 }
                 syntaxError("Undefined symbol \'" + termName + "\'");
             });
-            production = new Production(nonTerminals[nt], productionElements, isFirst);
+            var action = ntCases[nt][i].action;
+            production = new Production(nonTerminals[nt], productionElements, action, isFirst);
             isFirst = false;
             productions.push(production);
             nonTerminals[nt].addProduction(production);
@@ -210,4 +196,3 @@ function extract(code, terminals) {
 
 module.exports.NonTerminal = NonTerminal;
 module.exports.extract = extract;
-module.exports.Production = Production;

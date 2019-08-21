@@ -1,4 +1,3 @@
-var NonTerminal = require("./NonTerminal").NonTerminal;
 
 var Item = function(production, pos) {
     this.production = production;
