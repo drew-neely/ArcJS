@@ -3,11 +3,11 @@
 
 %%
 
-define '+' {}
-define '*' {}
-define '(' {}
-define ')' {}
-define id  {}
+define '+' {type: "plus"}
+define '*' {type: "times"}
+define '(' {type: "open_paren"}
+define ')' {type: "close_paren"}
+define id  {type: "id"}
 
 %%
 

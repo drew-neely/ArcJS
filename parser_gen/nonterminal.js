@@ -37,6 +37,43 @@ function validate(id) {
 }
 
 function indexOfInCode(code, symbol) {
+    var stack = [];
+    for(var i = 0; i < code.length; i++) {
+        var prev = code.charAt(i-1);
+        var char = code.charAt(i);
+        var top = (stack.length > 0)? stack[stack.length - 1] : null;
+        if(char == symbol && stack.length == 0) {
+            return i;
+        } if(char == '{' && top != '\'' && top != '\"') {
+            stack.push(char);
+        } else if(char == '}' && top != '\'' && top != '\"') {
+            if(top == '{') {
+                stack.pop();
+            } else {
+                syntaxError("Unmatched symbol : }")
+            }
+        } else if(char == '\'' && (prev != '\\' || (top != '\'' && top != '\"'))) {
+            if(top == '\'') {
+              stack.pop();
+            } else if(top != '\"') {
+              stack.push(char);
+            }
+        } else if(char == '\"' && (prev != '\\' || (top != '\'' && top != '\"'))) {
+          if(top == '\"') {
+            stack.pop();
+          } else if(top != '\'') {
+            stack.push(char)
+          } 
+        }
+    }
+    if(stack.length != 0) {
+        syntaxError("Unmatched symbol : " + stack[stack.length - 1]);
+    }
+    return -1;
+}
+
+/*
+function indexOfInCode(code, symbol) {
     var index;
     var start = 0;
     var again;
@@ -68,6 +105,7 @@ function indexOfInCode(code, symbol) {
     } while(again);
     return index;
 }
+*/
 
 var splitInCode = function(code, symbol) {
     var res = [];
@@ -113,11 +151,8 @@ function lex(code) {
         var prodCases = splitInCode(code.substring(0, index), '|').map(rhs => { // !!!
             rhs = rhs.trim();
             var bracketIndex = indexOfInCode(rhs, '{');
-            console.log("rhs: "+ rhs);
-            console.log("Found { at " + bracketIndex);
             var action = null;
             if(bracketIndex != -1) {
-                console.log("Non null action");
                 if(rhs.charAt(rhs.length - 1) != '}') {
                     syntaxError("Expected \'}\' at end of action definition");
                 }

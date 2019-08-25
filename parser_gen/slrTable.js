@@ -30,15 +30,16 @@ var ShiftOperation = function(state) { // stores next state number
 }
 
 var GotoOperation = function(state) { // sotres state number
-    this.opType = OperationType.SHIFT;
+    this.opType = OperationType.GOTO;
     this.state = state;
     this.toString = function() {
         return "" + this.state;
     }
 }
 
-var AcceptOperation = function() {
+var AcceptOperation = function(production) { // stores start production object
     this.opType = OperationType.ACCEPT;
+    this.production = production;
     this.toString = function() {
         return "ACC";
     }
@@ -74,6 +75,15 @@ var ParseTable = function(itemSet, productions, terminals, nonTerminals) {
         throw "Internal Error : nonTerminal symbol not found";
     }
 
+    this.getProductionIndex = function(production) {
+        for(var i = 0; i < this.productions.length; i++) {
+            if(this.productions[i].equals(production)) {
+                return i;
+            }
+        }
+        throw "Internal Error : production not found";
+    }
+
     this.EOFIndex = null;
     this.getEOFIndex = function() {
         if(this.EOFIndex != null) {
@@ -86,6 +96,20 @@ var ParseTable = function(itemSet, productions, terminals, nonTerminals) {
             }
         }
         throw "Internal Error : EOF symbol not found";
+    }
+
+    this.startProduction = null;
+    this.getStartProduction = function() {
+        if(this.startProduction != null) {
+            return this.startProduction;
+        }
+        for(var i = 0; i < this.productions.length; i++) {
+            if(this.productions[i].isStart) {
+                this.startProduction = this.productions[i];
+                return this.productions[i];
+            }
+        }
+        throw "Internal Error : start production not found";
     }
 
     this.actionTable = [];
@@ -197,7 +221,7 @@ var ParseTable = function(itemSet, productions, terminals, nonTerminals) {
                     throw "Internal Error : Invalid opType";
             }
         } else {
-            this.actionTable[state][index] = new AcceptOperation();
+            this.actionTable[state][index] = new AcceptOperation(this.getStartProduction());
         }
     }
     
@@ -305,7 +329,7 @@ var ParseTable = function(itemSet, productions, terminals, nonTerminals) {
                     throw "Internal Error : Invalid symbol";
                 }
             } else { // dot at end of item
-                if(item.production.isStart) { // production is start productino
+                if(item.production.isStart) { // production is start production
                     this.setAcceptAction(s);
                 } else {
                     var lhsIndex = this.getNonTerminalIndex(item.production.LHS);

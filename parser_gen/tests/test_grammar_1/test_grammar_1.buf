@@ -1,0 +1,14 @@
+
+
+%%
+
+define 'a' {TokenType : 'a'}
+define 'b' {TokenType : 'b'}
+
+%%
+
+Start : S;
+
+S   : 'a' S 'b' S
+    | 'a'
+    ;

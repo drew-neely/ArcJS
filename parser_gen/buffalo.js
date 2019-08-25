@@ -3,6 +3,13 @@ var Terminal = require("./terminal.js");
 var NonTerminal = require("./nonterminal.js");
 var { Production } = require("./production.js");
 var { buildParseTable } = require("./slrTable.js");
+var { generateParser } = require("./code_generation.js");
+
+
+if(!/\.buf$/g.test(process.argv[2])) {
+    console.error("Invalid file type : " + process.argv[2]);
+    process.exit(1);
+}
 
 var code;
 try {
@@ -30,4 +37,10 @@ var prodString = sections[2];
 
 var terminals = Terminal.extract(defString);
 var {nonTerminals, productions} = NonTerminal.extract(prodString, terminals);
+productions.forEach(e=>console.log(e.toString()));
 var parseTable = buildParseTable(productions, terminals, nonTerminals);
+console.log(parseTable.toString());
+var parser = generateParser(parseTable);
+
+var outputFilename = process.argv[2].replace(/\.buf$/g, ".js");
+fs.writeFileSync(outputFilename, parser);

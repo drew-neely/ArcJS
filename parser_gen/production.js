@@ -18,7 +18,7 @@ var Production = function(LHS, RHS, action, isStart) {
         return lString + " -> " + rString + "\n\t" + aString;
     }
     this.equals = function(other) {
-        if ((other instanceof Production) && this.LHS.equals(other.LHS) && this.RHS.length == other.RHS.length) {
+        if ((other instanceof Production) && this.LHS.equals(other.LHS) && this.RHS.length == other.RHS.length && this.ruleNumber == other.ruleNumber) {
             for(var i = 0; i < this.RHS.length; i++) {
                 if(this.RHS[i] != other.RHS[i]) {
                     return false;

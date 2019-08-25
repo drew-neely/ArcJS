@@ -1,0 +1,29 @@
+
+%%
+
+define '+'     {type: "plus"}
+define '-'     {type: "minus"}
+define '*'     {type: "times"}
+define '/'     {type: "divide"}
+define '('     {type: "open_paren"}
+define ')'     {type: "close_paren"}
+define number  {type: "number"}
+
+%%
+
+Start : Exp ;
+
+Exp : Exp '+' Term      { return $1 + $3; }
+    | Exp '-' Term      { return $1 - $3; }
+    | Term
+    ;
+
+Term : Term '*' Group   { return $1 * $3; }
+     | Term '/' Group   { return $1 / $3; }
+     | Group
+     ;
+
+Group : '(' Exp ')'     { return $2;       }
+      | number          { return $1.value; } 
+      ;
+      

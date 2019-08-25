@@ -75,7 +75,7 @@ function subAliases(code, aliases) {
     return code;
 }
 
-function objectify(objString) {
+function objectify(objString) { // !!! // This method is really bad, should fix
     objString = objString.trim();
     var firstChar = objString.charAt(0);
     var lastChar = objString.charAt(objString.length - 1);
@@ -93,6 +93,11 @@ function objectify(objString) {
                 syntaxError("Invalid object entry : \'" + pairStr + "\'");
             }
             pair = pair.map(e => e.trim());
+            valueStart = pair[1].charAt(0);
+            valueEnd = pair[1].charAt(pair[1].length - 1);
+            if((valueStart == '\"' && valueEnd == '\"')|| (valueStart == '\'' && valueEnd == '\'')) {
+                pair[1] = pair[1].substring(1, pair[1].length - 1);
+            }
             return pair;
         }).forEach(pair => {
             obj[pair[0]] = pair[1];
