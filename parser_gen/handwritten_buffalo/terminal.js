@@ -16,6 +16,29 @@ var Terminal = function(name, properties, isEOF) {
     this.isTerminal = () => true;
 }
 
+var ALIAS = "alias"
+// alias str1 str2 -> every future instance of str1 in right side of alias 
+//      and define operations will be replaced by str2
+
+var DEFINE = "define"
+// define terminal obj -> defines a terminal token 'term' that matches any
+//      token with the properties in obj : obj is in the form { str : str2 }
+//      where str2 is a javascript expression
+
+//returns array of two elements : [alias name, substitution]
+function getPair(op) {
+    var space = 0;
+    while(op.charAt(space) != ' ') {
+        space++;
+        if(space >= op.length - 1) {
+            syntaxError("Invalid argument pair :\n\t" + op);
+        }
+    }
+    var alias = op.substring(0, space);
+    var substitution = op.substring(space+1);
+    return [alias, substitution];
+}
+
 function isAlphaNumeric(char) {
     var code = char.charCodeAt(0);
     var num     = code > 47 && code < 58;
@@ -89,6 +112,36 @@ var syntaxError = function(str) {
     throw "Syntax Error: " + str;
 }
 
+function extract(defs) {
+    var ops = defs.split("\n").map(e => {
+        return e.replace(/\s+/g, ' ').trim(); // All white space -> ' '
+    }).filter(e => {
+        return e.length != 0; // Remove empty lines (probably won't be any ?)
+    });
+    var aliases = [];
+    var definitions = [];
+    for(var i = 0; i < ops.length; i++) {
+        var op = ops[i];
+        if(op.substring(0, ALIAS.length) == ALIAS) {
+            op = op.substring(ALIAS.length + 1);
+            var alias = getPair(op);
+            aliases.push(alias);
+        } else if(op.substring(0, DEFINE.length) == DEFINE) {
+            op = op.substring(DEFINE.length + 1);
+            var def = getPair(op);
+            var name = def[0];
+            var code = def[1];
+            code = subAliases(code, aliases);
+            definitions.push(new Terminal(name, objectify(code)));
+        } else {
+            syntaxError("Invalid line :\n\t" + op);
+        }
+    }
+    definitions.push(new Terminal("EOF", {type : "\"EOF\""}, true)) // !!! // define EOF symbol better
+    return definitions;
+}
+
 module.exports.Terminal = Terminal;
 module.exports.subAliases = subAliases;
+module.exports.extract = extract;
 module.exports.objectify = objectify;

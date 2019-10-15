@@ -1,0 +1,4 @@
+This folder contains an implementation of the buffalo parser
+generator written by hand entirely in javascript. This implementation
+is not meant to be maintained and is replaced by a version of the 
+buffalo parser generator with a parser written in Buffalo.

@@ -1,6 +1,5 @@
+
 var fs = require("fs");
-var {lex} = require("./buffalo_lexer.js");
-var {parse} = require("./buffalo_parser.js");
 var Terminal = require("./terminal.js");
 var NonTerminal = require("./nonterminal.js");
 var { Production } = require("./production.js");
@@ -21,23 +20,24 @@ try {
     process.exit(1);
 }
 
-var tokens = lex(code);
-var {header, terminals, nonTerminals, productions} = parse(tokens);
-
 /*
-console.log("HEADER :::\n");
-console.log(header)
-console.log("\n\nTERMINALS :::\n");
-terminals.forEach(e => console.log(e.toString()));
-console.log("\n\nNONTERMINALS :::\n");
-nonTerminals.forEach(e => console.log(e.toString()));
-console.log("\n\nPRODUCTIONS :::\n");
-productions.forEach(e => console.log(e.toString()));
+    First section is the header and contains any code that will be directly
+    placed at the top of the parser
+    %%
+    Second section is the definitions of the aliases and the terminals
+    alias for aliases and define terminals
+        alias NameString ValueString
+        define NameString JsonObject
 */
+var sections = code.split("%%");
+var header = sections[0];
+var defString = sections[1];
+var prodString = sections[2];
 
+var terminals = Terminal.extract(defString);
+var {nonTerminals, productions} = NonTerminal.extract(prodString, terminals);
 var parseTable = buildParseTable(productions, terminals, nonTerminals);
 var parser = generateParser(parseTable, header);
 
 var outputFilename = process.argv[2].replace(/\.buf$/g, ".js");
 fs.writeFileSync(outputFilename, parser);
-process.exit();
