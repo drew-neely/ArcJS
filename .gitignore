@@ -1,6 +1,16 @@
-.vscode
 SLR\ Grammar\ Testing.txt
 pasgram.txt
+
+# compiled and testing code
+parser_gen/tests/*/grammar.js
+parser_gen/tests/*/test.out
+
+
+###################################################################
+############## Node stuff and other annoying things ###############
+###################################################################
+
+.vscode
 
 # Logs
 logs

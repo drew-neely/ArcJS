@@ -15,7 +15,7 @@ Start : Exp ;
 
 Exp : Exp '+' Term      { return $1 + $3; }
     | Exp '-' Term      { return $1 - $3; }
-    | Term
+    | Term              { return $1; }
     ;
 
 Term : Term '*' Group   { return $1 * $3; }
