@@ -27,7 +27,6 @@ endif
 test : TESTS FORCE
 	for test in ./tests/*/ ; do \
 		$(MAKE) `basename $$test`.test ; \
-		echo "" ; \
 	done 
 
 clean : FORCE

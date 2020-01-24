@@ -1,0 +1,11 @@
+[
+  9,
+  34,
+  20,
+  6,
+  { Error: 'Reached end of input stream while parsing' },
+  { Error: 'Unexpected symbol : {"type":"number","value":4}' },
+  { Error: 'Unexpected symbol : {"type":"close_paren"}' },
+  { Error: 'Reached end of input stream while parsing' },
+  { Error: 'Reached end of input stream while parsing' }
+]
