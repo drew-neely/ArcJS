@@ -163,7 +163,11 @@ var parse = function(inputTokens) {
         }
         var action = __slrActionTable[state[state.length - 1]][lookaheadIndex];
         if(action == null) {
-            throw "Unexpected symbol : " + JSON.stringify(lookahead);
+            if(lookahead["type"] == "EOF") {
+                throw "Reached end of input stream while parsing";
+            } else {
+                throw "Unexpected symbol : " + JSON.stringify(lookahead);
+            }
         } else if(action.type == __OperationType.SHIFT) {
             stack.push(inputTokens.shift());
             state.push(action.state);
@@ -182,7 +186,7 @@ var parse = function(inputTokens) {
             }
         }
     }
-    throw "Reached end of file while parsing";
+    throw "Reached end of input stream while parsing";
 }
 
 module.exports.parse = parse;
