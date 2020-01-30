@@ -1,0 +1,30 @@
+--- Bootstrapped version givess following error when an unrecognized symbol is found
+
+```
+/Users/drewneely/Desktop/College/Side_Projects/ArcJS/parser_gen/slrTable.js:241
+                if(firstRhs.isTerminal()) {
+                            ^
+
+TypeError: Cannot read property 'isTerminal' of null
+    at ParseTable.getFirstSet (/Users/drewneely/Desktop/College/Side_Projects/ArcJS/parser_gen/slrTable.js:241:29)
+    at ParseTable.getFollowSet (/Users/drewneely/Desktop/College/Side_Projects/ArcJS/parser_gen/slrTable.js:285:57)
+    at new ParseTable (/Users/drewneely/Desktop/College/Side_Projects/ArcJS/parser_gen/slrTable.js:336:42)
+    at buildParseTable (/Users/drewneely/Desktop/College/Side_Projects/ArcJS/parser_gen/slrTable.js:394:22)
+    at Object.<anonymous> (/Users/drewneely/Desktop/College/Side_Projects/ArcJS/parser_gen/buffalo.js:38:18)
+    at Module._compile (internal/modules/cjs/loader.js:956:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:973:10)
+    at Module.load (internal/modules/cjs/loader.js:812:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:724:14)
+    at Function.Module.runMain (internal/modules/cjs/loader.js:1025:10)
+make[1]: *** [buffalo_parser.js] Error 1
+make: *** [parser] Error 2
+```
+
+The handwritten version reports a good error message in the format "Syntax Error: Undefined symbol 'XXX'"
+
+
+
+
+--- First defined production is used as the starting base - it should be able to recognize
+    an lhs with multiple productions as the first 
+    (workaround is to have a production "Start : <lhs name> ;" )
