@@ -2,20 +2,34 @@ MAKEFLAGS += --silent
 .PRECIOUS: %.js
 FORCE: ;
 
-boot ?= 1
+FILES = buffalo_lexer.js buffalo_parser.js buffalo_parser.buf buffalo.js \
+	code_generation.js item.js nonterminal.js production.js slrTable.js terminal.js
+
 ok ?= 0
+stable ?= 0
 
 TESTS := $(wildcard tests/*)
 
+stable : check_stable parser
+	rm -rf ./stable_buffalo/; mkdir ./stable_buffalo
+	for file in $(FILES) ; do \
+		cp $${file} ./stable_buffalo/ ; \
+	done
+	echo "Built stable verion"
+
+check_stable :
+	@echo "Are you sure you want to overwrite the stable version?\n[y/n]: \c" \
+		&& read ans && [ $${ans:-N} == y ]
+
 %.js : %.buf FORCE
-ifeq ($(boot), 0)
-	echo "Building $< with handwritten_buffalo"
-	node ./handwritten_buffalo/buffalo.js $<
-else
+ifeq ($(stable), 0)
 	-node buffalo.js $<
+else
+	echo "Building $< with stable_buffalo"
+	-node ./stable_buffalo/buffalo.js $<
 endif
 
-parser :
+parser : FORCE
 	($(MAKE) buffalo_parser.js)
 
 %.test : tests/%/test.js tests/%/grammar.buf tests/%/grammar.js FORCE

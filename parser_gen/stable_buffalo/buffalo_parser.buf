@@ -1,0 +1,140 @@
+var {SyntaxError, TokenTypes, lex} = require("./buffalo_lexer");
+var {Terminal, subAliases, extract, objectify} = require("./terminal.js");
+var {NonTerminal} = require("./nonterminal.js");
+var {Production} = require("./production.js");
+
+
+var header;
+var aliases = [];
+var terminals = [];
+var nonTerminals = [];
+var productions = [];
+
+var lookupSymbol = function(name) {
+    for(var i = 0; i < terminals.length; i++) {
+        if(terminals[i].name == name) {
+            return terminals[i];
+        }
+    }
+    for(var i = 0; i < nonTerminals.length; i++) {
+        if(nonTerminals[i].name == name) {
+            return nonTerminals[i];
+        }
+    }
+    return null;
+}
+
+var addDefinition = function(name, code) {
+    code = subAliases(code, aliases);
+    var terminal = new Terminal(name, objectify(code));
+    terminals.push(terminal);
+}
+
+// {lhs : NonTerminal, symbols: [string], action : string, eAction: string, fatal: bool}
+var registeredProductions = [];
+
+var registerProduction = function(lhsName, symbolActionPairs) {
+    var lhs = new NonTerminal(lhsName);
+    nonTerminals.push(lhs);
+    for(var i = 0; i < symbolActionPairs.length; i++) {
+        symbolActionPairs[i].lhs = lhs;
+        registeredProductions.push(symbolActionPairs[i]);
+    }
+}
+
+var createProductions = function() {
+    for(var i = 0; i < registeredProductions.length; i++) {
+        var lhs = registeredProductions[i].lhs;
+        var rhs = registeredProductions[i].symbols.map(lookupSymbol);
+        var action = registeredProductions[i].action;
+        var eAction = registeredProductions[i].eAction;
+        var fatal = registeredProductions[i].fatal;
+        var isStart = (i == 0);
+        var production = new Production(lhs, rhs, action, eAction, fatal, isStart);
+        lhs.addProduction(production);
+        productions.push(production);
+    }
+}
+
+var createProduction = function(symbols, action, eAction, fatal) {
+    if(fatal == undefined) {
+        fatal = false;
+    }
+    var productionObj = {
+        symbols: symbols,
+        action: action,
+        eAction: eAction,
+        fatal: fatal
+    }
+    return productionObj;
+}
+
+var getAll = function() {
+    return {
+        header: header,
+        terminals: terminals,
+        nonTerminals: nonTerminals,
+        productions: productions
+    }
+}
+
+%%
+
+define header   { type: TokenTypes.HEADER    }
+define 'pp'     { type: TokenTypes.BREAK     }
+define def      { type: TokenTypes.DEFINE    }
+define al       { type: TokenTypes.ALIAS     }
+define value    { type: TokenTypes.VALUE     }
+define id       { type: TokenTypes.ID        }
+define ':'      { type: TokenTypes.COLON     }
+define '|'      { type: TokenTypes.OR        }
+define '?'      { type: TokenTypes.EOR       }
+define ';'      { type: TokenTypes.SEMICOLON }
+define action   { type: TokenTypes.ACTION    }
+define eAction  { type: TokenTypes.EACTION   }
+define eof      { type: TokenTypes.EOF       }
+
+%%
+
+Start : Head 'pp' Definitions 'pp' Grammar eof { return getAll(); } ;
+
+Head : header   { header = $1.code; } ;
+
+Definitions : Definition Definitions
+            | Definition                { terminals.push(new Terminal("EOF", {type : "\"EOF\""}, true)); }
+            ;
+
+Definition : def value value  { addDefinition($2.value, $3.value);  }
+           | al value value   { aliases.push([$2.value, $3.value]); }
+           ;
+
+Grammar : Production Grammar
+        | Production             { createProductions(); }
+        ;
+
+Production : id RhsListStart ';' { registerProduction($1.id, $2); }
+           ;
+
+RhsListStart : ':' Rhs RhsListCont      { $3.unshift($2); return $3; }
+             | ':' Rhs                  { return [$2]; }
+             ;
+
+RhsListCont : '|' Rhs RhsListCont       { $3.unshift($2); return $3; }
+            | '|' Rhs                   { return [$2]; }
+            | '?' RhsError RhsListCont  { $3.unshift($2); return $3; }
+            | '?' RhsError              { return [$2]; }
+            ;
+
+RhsError : IdList eAction  { return createProduction($1, null, $2.action, true); }
+         | IdList          { return createProduction($1, null, null     , true); }
+         ;
+
+Rhs : IdList action eAction  { return createProduction($1, $2.action, $3.action); }
+    | IdList action          { return createProduction($1, $2.action, null     ); }
+    | IdList eAction         { return createProduction($1, null     , $2.action); }
+    | IdList                 { return createProduction($1, null     , null     ); }
+    ;
+
+IdList : id IdList  { $2.unshift($1.id); return $2; }
+       | id         { return [$1.id]; }
+       ;
