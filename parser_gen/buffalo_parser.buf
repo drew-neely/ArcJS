@@ -30,7 +30,7 @@ var addDefinition = function(name, code) {
     terminals.push(terminal);
 }
 
-// {lhs : NonTerminal, symbols: [string], action : string}
+// {lhs : NonTerminal, symbols: [string], action : string, eAction: string, fatal: bool}
 var registeredProductions = [];
 
 var registerProduction = function(lhsName, symbolActionPairs) {
@@ -47,11 +47,26 @@ var createProductions = function() {
         var lhs = registeredProductions[i].lhs;
         var rhs = registeredProductions[i].symbols.map(lookupSymbol);
         var action = registeredProductions[i].action;
+        var eAction = registeredProductions[i].eAction;
+        var fatal = registeredProductions[i].fatal;
         var isStart = (i == 0);
-        var production = new Production(lhs, rhs, action, isStart);
+        var production = new Production(lhs, rhs, action, eAction, fatal, isStart);
         lhs.addProduction(production);
         productions.push(production);
     }
+}
+
+var createProduction = function(symbols, action, eAction, fatal) {
+    if(fatal == undefined) {
+        fatal = false;
+    }
+    var productionObj = {
+        symbols: symbols,
+        action: action,
+        eAction: eAction,
+        fatal: fatal
+    }
+    return productionObj;
 }
 
 var getAll = function() {
@@ -73,8 +88,10 @@ define value    { type: TokenTypes.VALUE     }
 define id       { type: TokenTypes.ID        }
 define ':'      { type: TokenTypes.COLON     }
 define '|'      { type: TokenTypes.OR        }
+define '?'      { type: TokenTypes.EOR       }
 define ';'      { type: TokenTypes.SEMICOLON }
 define action   { type: TokenTypes.ACTION    }
+define eAction  { type: TokenTypes.EACTION   }
 define eof      { type: TokenTypes.EOF       }
 
 %%
@@ -87,7 +104,7 @@ Definitions : Definition Definitions
             | Definition                { terminals.push(new Terminal("EOF", {type : "\"EOF\""}, true)); }
             ;
 
-Definition : def value value  { addDefinition($2.value, $3.value); }
+Definition : def value value  { addDefinition($2.value, $3.value);  }
            | al value value   { aliases.push([$2.value, $3.value]); }
            ;
 
@@ -95,15 +112,27 @@ Grammar : Production Grammar
         | Production             { createProductions(); }
         ;
 
-Production : id ':' RhsList ';'  { registerProduction($1.id, $3); }
+Production : id RhsListStart ';' { registerProduction($1.id, $2); }
            ;
 
-RhsList : Rhs '|' RhsList     { $3.unshift($1); return $3; }
-        | Rhs                 { return [$1]; }
-        ;
+RhsListStart : ':' Rhs RhsListCont      { $3.unshift($2); return $3; }
+             | ':' Rhs                  { return [$2]; }
+             ;
 
-Rhs : IdList action    { return {symbols: $1, action: $2.action }; }
-    | IdList           { return {symbols: $1, action: null      }; }
+RhsListCont : '|' Rhs RhsListCont       { $3.unshift($2); return $3; }
+            | '|' Rhs                   { return [$2]; }
+            | '?' RhsError RhsListCont  { $3.unshift($2); return $3; }
+            | '?' RhsError              { return [$2]; }
+            ;
+
+RhsError : IdList eAction  { return createProduction($1, null, $2.action, true); }
+         | IdList          { return createProduction($1, null, null     , true); }
+         ;
+
+Rhs : IdList action eAction  { return createProduction($1, $2.action, $3.action); }
+    | IdList action          { return createProduction($1, $2.action, null     ); }
+    | IdList eAction         { return createProduction($1, null     , $2.action); }
+    | IdList                 { return createProduction($1, null     , null     ); }
     ;
 
 IdList : id IdList  { $2.unshift($1.id); return $2; }

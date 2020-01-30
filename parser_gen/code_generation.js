@@ -18,7 +18,10 @@ var __getInputTerminal = function(inputToken) {
 `;
 
 var parseFunctionString = `
-var parse = function(inputTokens) {
+var parse = function(inputTokens, errorCallback) {
+    if(errorCallback != undefined && typeof errorCallback != "function") {
+        throw "Error handling callback is not a function";
+    }
     inputTokens.push({type:"EOF"});
     var stack = [];
     var state = [0];
@@ -41,11 +44,22 @@ var parse = function(inputTokens) {
         } else if(action.type == __OperationType.REDUCE || action.type == __OperationType.ACCEPT) {
             var argc = __reduceFunctionArgcs[action.production];
             var args = [];
+            var fatal = __fatalProductions[action.production];
             for(var i = 0; i < argc; i++) {
                 args.unshift(stack.pop());
                 state.pop();
             }
-            var result = __reduceFunctions[action.production].apply(null, args);
+            if(__errorFunctions[action.production] != null) {
+                var errorFunction = __errorFunctions[action.production];
+                var error = errorFunction.apply(null, args);
+                if(fatal) {
+                    throw new Error(error);
+                } else if(errorCallback != undefined) {
+                    errorCallback(error);
+                }
+            }
+            var reduceFunction = __reduceFunctions[action.production];
+            var result = reduceFunction.apply(null, args);
             stack.push(result);
             state.push(__slrGotoTable[state[state.length - 1]][__productionLHS[action.production]]);
             if(action.type == __OperationType.ACCEPT) {
@@ -105,7 +119,7 @@ var createFunctionArrayAssignment = function(name, functionNames) {
     return createAssignment(name,str);
 }
 
-// Works only for arrays of any dimension that contain only strings and numbers
+// Works only for arrays of any dimension that contain only primitives
 var createObjectAssignment = function(name, obj) {
     var str = JSON.stringify(obj);
     return createAssignment(name, str);
@@ -198,6 +212,38 @@ var generateParser = function(slrTable, headerString) {
     // console.log(reduceFunctionArgcs);
     // console.log(productionLHSIndexes)
 
+    // create error/warning function strings, list of the names of the 
+    // error/warning functions, and a list of the fatalities of the productions
+    //     errorFunctions,
+    //     errorFunctionNames,
+    //     fatalProductions
+    var errorFunctions = [];
+    var errorFunctionNames = [];
+    var fatalProductions = [];
+    for(var i = 0; i < slrTable.productions.length; i++) {
+        var production = slrTable.productions[i];
+        var eAction = production.eAction;
+        var fatal = production.fatal;
+        if(fatal && eAction == null) {
+            eAction = "return $1;";
+        }
+        if(eAction != null) {
+            var name = "__error" + i;
+            errorFunctionNames.push(name);
+            errorFunctions.push(createFunctionAssignment(name, eAction));
+        } else {
+            errorFunctionNames.push(null);
+            errorFunctions.push("");
+        }
+        fatalProductions.push(fatal);
+    }
+    errorFunctions = errorFunctions.join('');
+    errorFunctionNames = createFunctionArrayAssignment("__errorFunctions", errorFunctionNames);
+    fatalProductions = createObjectAssignment("__fatalProductions", fatalProductions);
+    // console.log(errorFunctions);
+    // console.log(errorFunctionNames);
+    // console.log(fatalProductions);
+
     // create operation type definition
     //     operationTypeObject
     var operationTypeObject = createObjectAssignment("__OperationType", ParserOperationType);
@@ -242,6 +288,9 @@ var generateParser = function(slrTable, headerString) {
     parserCode += reduceFunctions + '\n';
     parserCode += reduceFunctionNames + '\n';
     parserCode += reduceFunctionArgcs + '\n';
+    parserCode += errorFunctions + '\n';
+    parserCode += errorFunctionNames + '\n';
+    parserCode += fatalProductions + '\n';
     parserCode += productionLHSIndexes + '\n';
     parserCode += operationTypeObject + '\n';
     parserCode += slrActionTable + '\n';

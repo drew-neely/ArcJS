@@ -1,7 +1,7 @@
 var Item = require("./item.js").Item;
 
 var nextProductionRuleNumber = 0;
-var Production = function(LHS, RHS, action, isStart) {
+var Production = function(LHS, RHS, action, eAction, fatal, isStart) {
     if(!LHS.isNonTerminal()) {
         throw "Internal Error : LHS of production must be a NonTerminal";
     }
@@ -10,6 +10,8 @@ var Production = function(LHS, RHS, action, isStart) {
     this.RHS = RHS;
     this.isStart = isStart;
     this.action = action;
+    this.eAction = eAction;
+    this.fatal = fatal;
     this.startItem = new Item(this);
     this.toString = function() {
         var lString = this.LHS.name

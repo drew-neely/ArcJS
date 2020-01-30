@@ -22,9 +22,11 @@ var TokenTypes = {
     ID : 4,
     COLON : 6,
     OR : 7,
-    SEMICOLON : 8,
-    ACTION : 9,
-    EOF : 10
+    EOR : 8,
+    SEMICOLON : 9,
+    ACTION : 10,
+    EACTION : 11,
+    EOF : 12
 }
 
 Array.prototype.peek = function() {return this[this.length - 1];}
@@ -35,6 +37,11 @@ var LexerState = function(string) {
     this.linePos = 0;
     this.prevChar = '';
     this.specialStack = [];
+    this.lexingPhases = { NONE: -1, HEADER: 0, DEFINITIONS: 1, GRAMMAR: 2 };
+    this.lexingPhase = this.lexingPhases.NONE;
+    this.lexHeader      = () => { this.lexingPhase = this.lexingPhases.HEADER      };
+    this.lexDefinitions = () => { this.lexingPhase = this.lexingPhases.DEFINITIONS };
+    this.lexGrammar     = () => { this.lexingPhase = this.lexingPhases.GRAMMAR     };
     this._pop = function() {
         var char = string.charAt(this.pos);
         if(char == '/' && string.charAt(this.pos + 1) == '/') {
@@ -80,6 +87,24 @@ var LexerState = function(string) {
                     }
                 }
                 break;
+            case '<' :
+                if(this.lexingPhase == this.lexingPhases.GRAMMAR) {
+                    if(prevSpecial != '\'' && prevSpecial != '\"') {
+                        this.specialStack.push('<');
+                    }
+                }
+                break;
+            case '>' :
+                if(this.lexingPhase == this.lexingPhases.GRAMMAR) {
+                    if(prevSpecial != '\'' && prevSpecial != '\"') {
+                        if(prevSpecial == '<') {
+                            this.specialStack.pop();
+                        } else {
+                            SyntaxError("unexpected symbol \'>\'", string, this.line, this.linePos);
+                        }
+                    }
+                }
+                break;
             case '' :
                 if(this.specialStack.length != 0) {
                     switch(this.specialStack.peek()) {
@@ -91,6 +116,9 @@ var LexerState = function(string) {
                             break;
                         case '\"' :
                             SyntaxError("reached end of file while parsing, expected symbol \'\"\'", code, state.line, state.linePos, true);
+                            break;
+                        case '<' :
+                            SyntaxError("reached end of file while parsing, expected symbol \'>\'", code, state.line, state.linePos, true);
                             break;
                     }
                 }
@@ -134,6 +162,7 @@ var lex = function(code) {
     var state = new LexerState(code);
 
     // Extract header
+    state.lexHeader();
     var headerCode = "";
     var foundHeader = false;
     while(!state.isEmpty()) {
@@ -162,6 +191,7 @@ var lex = function(code) {
 
     var word = "";
     // lex definitions
+    state.lexDefinitions();
     while(!(state.peek(2) == "%%" && state.specialStack.length == 0)) {
         if(state.isEmpty()) {
             SyntaxError("reached end of file while parsing, expected symbol \'%%\' at end of definition section", code, state.line, state.linePos, true);
@@ -187,12 +217,15 @@ var lex = function(code) {
     word = "";
 
     // lex grammar
+    state.lexGrammar();
     while(true) {
         var char = state.pop();
-        if(state.specialStack.length == 0 && ([':', '|', ';','{',''].indexOf(char) != -1 || /\s/.test(char))) {
+        if(state.specialStack.length == 0 && ([':', '|', ';','{','<',''].indexOf(char) != -1 || /\s/.test(char))) {
             if(word.length != 0) {
                 if(word.charAt(0) == '{' && word.charAt(word.length - 1) == '}') {
                     tokens.push({type: TokenTypes.ACTION, action: word.substring(1,word.length - 1).trim()});
+                } else if(word.charAt(0) == '<' && word.charAt(word.length - 1) == '>') {
+                    tokens.push({type: TokenTypes.EACTION, action: word.substring(1,word.length - 1).trim()});
                 } else {
                     tokens.push({type: TokenTypes.ID, id: word});
                 }
@@ -202,13 +235,16 @@ var lex = function(code) {
         if(char == '') {
             break;
         }
-        if(state.specialStack.length == 0 && (char == ':' || char == '|' || char == ';')) {
+        if(state.specialStack.length == 0 && (char == ':' || char == '|' || char =='?' || char == ';')) {
             switch(char) {
                 case ':' :
                     tokens.push({type: TokenTypes.COLON});
                     break;
                 case '|' :
                     tokens.push({type: TokenTypes.OR});
+                    break;
+                case '?' :
+                    tokens.push({type: TokenTypes.EOR});
                     break;
                 case ';' :
                     tokens.push({type: TokenTypes.SEMICOLON});
