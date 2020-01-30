@@ -1,0 +1,25 @@
+
+%%
+
+define yeet  { type: "yeet"  }
+define em    { type: "em"    }
+define bois  { type: "bois"  }
+define girls { type: "girls" }
+define yaas  { type: "yaas"  }
+
+%%
+
+Start: Sentence ;
+
+Sentence : YeetEm         { return "yeeeeet"; }
+         | YaasEm
+         ;
+
+YeetEm   : yeet em bois
+         ? yeet em girls  < return "girls dont yeet!"; >
+         ;
+
+YaasEm   : yaas girls     { return "awwwww..."; }
+         | yaas bois      { return "ummmmm..."; }
+                          < return "dont yaas boi me boi!"; >
+         ;
