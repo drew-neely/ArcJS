@@ -1,4 +1,14 @@
+MAKEFLAGS += --silent
 
+parser: arc_parser.js
 
-buffalo : parser_gen/buffalo.js parser_gen/terminal.js parser_gen/nonterminal.js
-	@node parser_gen/buffalo.js grammar.txt
+arc_parser.js : arc_parser.buf
+	$(MAKE) -C parser_gen ../arc_parser.js stable=1
+
+test :
+	node arc.js tests/test1.js
+
+clean : 
+	rm arc_parser.js
+
+.PHONY : parser test clean

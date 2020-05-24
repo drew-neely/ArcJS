@@ -25,7 +25,7 @@ check_stable :
 ifeq ($(stable), 0)
 	-node buffalo.js $<
 else
-	echo "Building $< with stable_buffalo"
+	# echo "Building $< with stable_buffalo"
 	-node ./stable_buffalo/buffalo.js $<
 endif
 

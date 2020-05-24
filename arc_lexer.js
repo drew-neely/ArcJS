@@ -1,4 +1,3 @@
-
 var Token = require("./token.js");
 
 var syntaxError = function(str) {

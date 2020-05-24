@@ -1,4 +1,4 @@
-var lexer = require("./lexer.js");
+var lexer = require("./arc_lexer.js");
 var fs = require("fs");
 
 var code;
